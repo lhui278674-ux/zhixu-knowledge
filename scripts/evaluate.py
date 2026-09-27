@@ -12,6 +12,12 @@ import httpx
 
 
 def evaluate(client, dataset, library_ids=None):
+    if not library_ids and dataset.get('fictional'):
+        libraries = client.get('/api/libraries')
+        libraries.raise_for_status()
+        library_ids = [l['id'] for l in libraries.json() if l['demo']]
+        if not library_ids:
+            raise ValueError('虚构评估需要显式可访问的演示文库，请先导入演示并授权。')
     cases = []
     for case in dataset['cases']:
         started = time.perf_counter()

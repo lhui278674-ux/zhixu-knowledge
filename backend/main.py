@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Upload
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from . import db, qa
+from . import db, qa, domain
 from .accounts import router as account_router
 from .portal import router as portal_router, check_directory, read_upload
 from .auth import admin, current, document_access, library_access, allowed_ids
@@ -49,6 +49,8 @@ async def boundary(request: Request, call_next):
             return JSONResponse({'detail': '缺少同源请求标记。'}, status_code=403)
         origin = request.headers.get('origin')
         allowed = {f'http://127.0.0.1:{p}' for p in (8000, 5173)} | {f'http://localhost:{p}' for p in (8000, 5173)}
+        if request.url.hostname in {'127.0.0.1', 'localhost'}:
+            allowed.add(f'{request.url.scheme}://{request.url.netloc}')
         if origin and origin not in allowed:
             return JSONResponse({'detail': '拒绝跨来源写入。'}, status_code=403)
     response = await call_next(request)
@@ -193,12 +195,22 @@ def raw_file(did: str, user=Depends(current)):
 def do_search(body: Question, user=Depends(current)):
     if body.library_ids and not set(body.library_ids).issubset(allowed_ids(user)):
         raise HTTPException(404, '检索范围包含不存在或未授权的知识库。')
+    decision = domain.safe_assess(body.question)
+    if not decision.allowed:
+        return {'results': [], **decision.public(), 'message': domain.REFUSAL if decision.status == 'out_of_scope' else domain.CLARIFICATION}
     try:
-        return {'results': search(user, body.question, body.library_ids or None)}
+        return {'results': domain.filter_evidence(decision, search(user, decision.question, body.library_ids or None)), **decision.public()}
     except ModelUnavailable as e:
         raise HTTPException(503, str(e)) from None
     except Exception:
         raise HTTPException(503, '检索失败，请检查本地索引与模型状态。') from None
+
+
+@app.post('/api/qa/domain')
+def check_domain(body: Question, user=Depends(current)):
+    if body.library_ids and not set(body.library_ids).issubset(allowed_ids(user)):
+        raise HTTPException(404, '问答范围包含不存在或未授权的知识库。')
+    return domain.safe_assess(body.question).public()
 
 
 @app.post('/api/qa/questions')
@@ -254,13 +266,47 @@ async def events(qid: str, request: Request, after: int = 0, user=Depends(curren
                 yield 'event: done\ndata: {"status":"session_expired"}\n\n'
                 return
             visible = qa.visible_question(live, owned(qid, live))
-            if visible['status'] == 'source_changed':
+            if visible['status'] == 'source_changed' or visible.get('_policy_reset'):
                 yield 'event: reset\ndata: ' + json.dumps({'answer': visible['answer'], 'citations': []}, ensure_ascii=False) + '\n\n'
-                yield 'event: done\ndata: {"status":"source_changed"}\n\n'
+                yield 'event: done\ndata: ' + json.dumps({'status': visible['status']}) + '\n\n'
                 return
+            if visible['status'] in qa.TERMINAL:
+                # Old event payloads are not trusted simply because the current
+                # question row passes policy. Replay only the canonical answer.
+                saved = db.rows('SELECT kind,payload FROM events WHERE question_id=? ORDER BY seq', (qid,))
+                try:
+                    text = ''.join(json.loads(e['payload'])['text'] for e in saved if e['kind'] == 'delta')
+                    cites = [json.loads(e['payload'])['citations'] for e in saved if e['kind'] == 'citations']
+                    consistent = text == visible['answer'] and all(c == visible['citations'] for c in cites)
+                except (ValueError, KeyError, TypeError):
+                    consistent = False
+                if not consistent:
+                    yield 'event: reset\ndata: ' + json.dumps({'answer': visible['answer'], 'citations': []}, ensure_ascii=False) + '\n\n'
+                    yield 'event: done\ndata: ' + json.dumps({'status': visible['status']}) + '\n\n'
+                    return
             for e in db.rows('SELECT * FROM events WHERE question_id=? AND seq>? ORDER BY seq', (qid, cursor)):
                 cursor = e['seq']
-                yield f'id: {cursor}\nevent: {e["kind"]}\ndata: {e["payload"]}\n\n'
+                # Rebuild progress from backend-owned labels; stored event
+                # messages and extra JSON fields are untrusted historical data.
+                if e['kind'] == 'status':
+                    try:
+                        status = json.loads(e['payload'])['status']
+                    except (ValueError, KeyError, TypeError):
+                        continue
+                    labels = {'queued': '问题已加入队列', 'retrieving': '正在检索授权资料',
+                              'waiting_quota': '正在等待模型额度', 'generating': '正在生成并校验回答'}
+                    if status not in labels:
+                        continue
+                    payload = {'status': status, 'message': labels[status]}
+                elif e['kind'] == 'done' and visible['status'] in qa.TERMINAL:
+                    payload = {'status': visible['status']}
+                elif e['kind'] in {'delta', 'citations'} and visible['status'] in qa.TERMINAL:
+                    data = json.loads(e['payload'])
+                    field = 'text' if e['kind'] == 'delta' else 'citations'
+                    payload = {field: data[field]}
+                else:
+                    continue
+                yield f'id: {cursor}\nevent: {e["kind"]}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n'
             if visible['status'] in qa.TERMINAL:
                 return
             yield ': heartbeat\n\n'
@@ -274,7 +320,8 @@ def system(user=Depends(current)):
     import os
     result = {'embedding': models.state, 'detail': models.detail,
               'generation_configured': bool(os.environ.get('AIHUBMIX_API_KEY', '').strip()), 'quota': qa.quota_state(),
-              'model': 'coding-kimi-k3-free', 'local_storage': True}
+              'model': 'coding-kimi-k3-free', 'local_storage': True,
+              'domain_policy': {'version': domain.VERSION, 'enforced': True, 'scope': '本企业业务、已授权知识库资料及本系统使用'}}
     if user['role'] == 'admin':
         result['queue_count'] = db.one("SELECT COUNT(*) n FROM questions WHERE status IN ('queued','retrieving','waiting_quota','generating')")['n']
     return result

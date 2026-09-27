@@ -1,4 +1,5 @@
 import type {AdminChange, Audit, Citation, Directory, Doc, Library, Question, Submission, User} from './shared';
+import {domainDecision,domainRefusal,domainClarification,safeDemoSource} from './domain';
 
 export const isPublicDemo = import.meta.env.VITE_PUBLIC_DEMO === 'true';
 type Chunk = {id:string;text:string;locator:{label:string;page?:number}};
@@ -68,6 +69,10 @@ function log(s:State,action:string,target:string){const u=current(s);s.audit.uns
 function validateFolder(s:State,lid:string,fid:string|null){if(fid&&!s.directories.some(f=>f.id===fid&&f.library_id===lid))fail('目录不存在。')}
 function descendants(s:State,fid:string){const ids=new Set([fid]);let previous=0;while(previous!==ids.size){previous=ids.size;s.directories.forEach(f=>{if(f.parent_id&&ids.has(f.parent_id))ids.add(f.id)})}return ids}
 function evidence(s:State,question:string,scope:string[]):{citations:Citation[];status:string;answer:string}{
+  const decision=domainDecision(question);
+  if(decision.status!=='allowed')return {status:decision.status,citations:[],answer:decision.status==='out_of_scope'?domainRefusal:domainClarification};
+  if(decision.help)return {status:'completed',citations:[],answer:decision.help+(decision.mixed?'\n\n'+domainRefusal:'')};
+  question=decision.question;
   if(question.trim().length<5)return {status:'clarify',citations:[],answer:'请补充具体事项，例如项目名称、费用类型或操作场景。'};
   const docs=s.documents.filter(d=>d.status==='ready'&&can(s,d.library_id)&&(!scope.length||scope.includes(d.library_id)));
   const common=new Set(['什么','怎么','如何','需要','应该','多少','公司','员工','可以','是否','哪些','多久','申请','项目','资料']);
@@ -76,7 +81,7 @@ function evidence(s:State,question:string,scope:string[]):{citations:Citation[];
   for(const run of question.match(/[\p{Script=Han}]+/gu)||[])for(let i=0;i<run.length-1;i++){const t=run.slice(i,i+2);if(!common.has(t)&&!tokens.includes(t))tokens.push(t)}
   const hints:Record<string,string>={'领取办公设备':'办公设备申请','请假':'提前一天','交付节点':'2026年10月15日','报销':'电子发票','访问权限':'直属主管','餐费':'餐费上限','ORBIT':'ORBIT-7429'};
   const hint=Object.entries(hints).find(([k])=>question.includes(k))?.[1];
-  const pool=docs.flatMap(d=>d.chunks.map(c=>({d,c})));
+  const pool=docs.flatMap(d=>d.chunks.filter(c=>safeDemoSource(question,c.text)).map(c=>({d,c})));
   const frequency=new Map(tokens.map(t=>[t,pool.filter(x=>x.c.text.toLowerCase().includes(t)).length]));
   let scored=pool.map(x=>({...x,score:tokens.reduce((total,t)=>total+(x.c.text.toLowerCase().includes(t)?Math.log(1+pool.length/(1+(frequency.get(t)||0))):0),0)+(hint&&x.c.text.includes(hint)?20:0)})).filter(x=>x.score>=5).sort((a,b)=>b.score-a.score);
   const conflict=question.includes('住宿')&&(question.includes('上限')||question.includes('标准'));
@@ -86,7 +91,16 @@ function evidence(s:State,question:string,scope:string[]):{citations:Citation[];
   const explicit=question.match(/(?:19|20)\d{2}(?=年)|\b[A-Z][A-Z0-9]*-\d[A-Z0-9-]*\b/g)||[];
   if(explicit.some(term=>!citations.some(c=>c.text.includes(term))))return {status:'insufficient',citations:[],answer:'没有找到包含所提年份或编号的文档依据，请核对事项后再提问。'};
   if(!citations.length)return {status:'insufficient',citations:[],answer:'没有找到足够的文档依据。请补充关键词，或改用文档搜索。'};
-  return {status:conflict&&citations.length===2?'conflict':'completed',citations,answer:(conflict&&citations.length===2?'两份来源的住宿标准不一致：400元与500元。请核对制度版本后使用。\n\n':'证据摘录：\n\n')+citations.map(c=>`[${c.source_id}] ${c.text}`).join('\n\n')};
+  return {status:conflict&&citations.length===2?'conflict':'completed',citations,answer:(conflict&&citations.length===2?'两份来源的住宿标准不一致：400元与500元。请核对制度版本后使用。\n\n':'证据摘录：\n\n')+citations.map(c=>`[${c.source_id}] ${c.text}`).join('\n\n')+(decision.mixed?'\n\n'+domainRefusal:'')};
+}
+
+function visibleQuestion(s:State,q:Question & {user_id:string}){
+  const decision=domainDecision(q.question);
+  if(decision.status!=='allowed')return {...q,status:decision.status,answer:decision.status==='out_of_scope'?domainRefusal:domainClarification,citations:[]};
+  if(q.citations.some(c=>!s.documents.some(d=>d.id===c.document_id&&can(s,d.library_id))))return {...q,status:'source_changed',answer:'引用文档已移除或文库授权已变更，请重新提问。',citations:[]};
+  if(q.status==='out_of_scope')return {...q,answer:domainRefusal,citations:[]};
+  if(!decision.help&&q.status==='completed'&&(!q.citations.length||!safeDemoSource(decision.question,q.answer)))return {...q,status:'validation_failed',answer:'回答未通过企业领域与有效来源校验，已隐藏内容。',citations:[]};
+  return q;
 }
 
 export async function demoApi<T>(path:string,options:RequestInit={}):Promise<T>{
@@ -161,10 +175,10 @@ export async function demoApi<T>(path:string,options:RequestInit={}):Promise<T>{
     if(p==='/audit'){admin(s);return s.audit}
     if(p==='/system'){admin(s);return {embedding:'ready',detail:'浏览器证据检索',generation_configured:false,quota:{minute_used:0,day_used:0,token_reserved:0},queue_count:0}}
     if(p==='/demo'){admin(s);return {message:'已加载 7 个文库、32 份虚构资料。可通过顶部重置演示恢复原始资料。'}}
-    if(p==='/qa/questions'&&method==='GET')return s.questions.filter(q=>q.user_id===u.id).map(q=>({...q,citations:q.citations.filter(c=>s.documents.some(d=>d.id===c.document_id&&can(s,d.library_id)))}));
+    if(p==='/qa/questions'&&method==='GET')return s.questions.filter(q=>q.user_id===u.id).map(q=>visibleQuestion(s,q));
     if(p==='/qa/questions'&&method==='POST'){const question=String(body.question||'').trim();if(!question||question.length>1000)fail('请输入 1–1000 字的问题。');const scope=body.library_ids||[];scope.forEach((lid:string)=>library(s,lid));const answer=evidence(s,question,scope);const q={id:id(),user_id:u.id,question,...answer,mode:'evidence',created_at:now(),library_ids:JSON.stringify(scope)};s.questions.unshift(q);persist();return {id:q.id}}
     match=p.match(/^\/qa\/questions\/([^/]+)$/);
-    if(match){const q=s.questions.find(q=>q.id===match![1]&&q.user_id===u.id);if(!q)fail('问答记录不存在。',404);if(q.citations.some(c=>!s.documents.some(d=>d.id===c.document_id&&can(s,d.library_id))))return {...q,status:'source_changed',answer:'引用文档已移除或文库授权已变更，请重新提问。',citations:[]};return q}
+    if(match){const q=s.questions.find(q=>q.id===match![1]&&q.user_id===u.id);if(!q)fail('问答记录不存在。',404);return visibleQuestion(s,q)}
     fail('此操作请在本地完整版本体验。',400);
   })();
   return structuredClone(result) as T;

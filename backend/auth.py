@@ -48,6 +48,14 @@ def allowed_ids(user):
     return [r['library_id'] for r in db.rows('SELECT library_id FROM members WHERE user_id=?', (user['id'],))]
 
 
+def question_library_ids(user, requested=None):
+    permitted = set(allowed_ids(user))
+    if requested:
+        return [lid for lid in requested if lid in permitted]
+    # Demo data is opt-in even when no enterprise library has been created yet.
+    return [r['id'] for r in db.rows('SELECT id FROM libraries WHERE demo=0') if r['id'] in permitted]
+
+
 def library_access(user, library_id):
     if library_id not in allowed_ids(user):
         raise HTTPException(404, '知识库不存在或未授权。')

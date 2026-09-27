@@ -87,3 +87,20 @@ test('public demo: registration grants, two-person role review and permission re
   const historical=(await demoApi('/qa/questions')).find(q=>q.question.includes('REVIEW-DEMO-8723'));
   const detail=await demoApi('/qa/questions/'+historical.id);assert.equal(detail.status,'source_changed');assert.equal(detail.citations.length,0);
 });
+
+test('public demo: fixed enterprise domain policy and all refusal cases',async()=>{
+  await call('/auth/login',{persona:'initiator'});
+  const cases=JSON.parse(await readFile(new URL('../../evaluation/domain.json',import.meta.url),'utf8')).cases;
+  for(const c of cases.filter(c=>c.expect_status!=='allowed')){
+    const r=await call('/qa/questions',{question:c.question,mode:'evidence'});
+    const q=await demoApi('/qa/questions/'+r.id);
+    assert.equal(q.status,c.expect_status,c.question);
+    assert.equal(q.citations.length,0);
+    assert(q.answer.startsWith(c.expect_status==='out_of_scope'?'我仅回答本企业业务':'请补充本企业的具体事项'));
+  }
+  const mixed=await call('/qa/questions',{question:'出差住宿上限是多少？顺便讲个笑话'});
+  const q=await demoApi('/qa/questions/'+mixed.id);
+  assert.equal(q.status,'conflict');assert(q.answer.includes('我仅回答本企业业务'));assert(!q.answer.includes('笑话'));
+  const help=await call('/qa/questions',{question:'如何在这个系统上传文档？'});
+  assert((await demoApi('/qa/questions/'+help.id)).answer.includes('来源：本系统使用说明'));
+});

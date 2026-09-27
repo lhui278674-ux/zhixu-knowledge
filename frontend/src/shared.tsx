@@ -28,8 +28,8 @@ export const patch=<T,>(path:string,body:unknown)=>api<T>(path,{method:'PATCH',b
 export const date=(n:number)=>new Date(n*1000).toLocaleDateString('zh-CN');
 export const time=(n:number)=>new Date(n*1000).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 export const size=(n:number)=>n>=1024*1024?(n/1024/1024).toFixed(1)+' MB':(n/1024).toFixed(1)+' KB';
-export const terminal=['completed','insufficient','clarify','conflict','model_unavailable','rate_limited','source_changed','validation_failed','cancelled','interrupted','retrieval_failed'];
-export const statusLabel:Record<string,string>={active:'已启用',inactive:'已停用',approved:'已通过',rejected:'已驳回',pending:'待审核',queued:'等待处理',processing:'解析中',ready:'可检索',needs_ocr:'需要 OCR',parse_failed:'解析失败',model_unavailable:'服务不可用',retrieving:'检索中',waiting_quota:'限流排队',generating:'正在生成',completed:'已完成',insufficient:'缺少依据',clarify:'需要补充',conflict:'来源冲突',rate_limited:'达到限额',source_changed:'引用已失效',validation_failed:'引用校验未通过',cancelled:'已取消',interrupted:'任务已中断',retrieval_failed:'检索失败'};
+export const terminal=['completed','insufficient','clarify','conflict','model_unavailable','rate_limited','source_changed','validation_failed','cancelled','interrupted','retrieval_failed','out_of_scope'];
+export const statusLabel:Record<string,string>={active:'已启用',inactive:'已停用',approved:'已通过',rejected:'已驳回',pending:'待审核',queued:'等待处理',processing:'解析中',ready:'可检索',needs_ocr:'需要 OCR',parse_failed:'解析失败',model_unavailable:'服务不可用',retrieving:'检索中',waiting_quota:'限流排队',generating:'正在生成',completed:'已完成',insufficient:'缺少依据',clarify:'需要补充',conflict:'来源冲突',rate_limited:'达到限额',source_changed:'引用已失效',validation_failed:'引用校验未通过',cancelled:'已取消',interrupted:'任务已中断',retrieval_failed:'检索失败',out_of_scope:'超出服务范围'};
 export const actionLabels:Record<string,string>={promote:'新增管理员',demote:'转为员工',deactivate:'停用管理员',reactivate:'启用管理员',duties:'调整治理职责'};
 
 export function Mark(){return <span className="brand-mark"><Layers size={22}/></span>}

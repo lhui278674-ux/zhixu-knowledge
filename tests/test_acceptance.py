@@ -37,9 +37,16 @@ def wait_question(client, qid, timeout=30):
 
 
 def ask(client, question, mode='evidence', scope=None):
-    r = client.post('/api/qa/questions', json={'question': question, 'mode': mode, 'library_ids': scope or []}, headers=HEADERS)
+    # Demo corpus is explicitly selected. An empty scope now means enterprise libraries only.
+    selected = scope if scope is not None else [l['id'] for l in client.get('/api/libraries').json()]
+    r = client.post('/api/qa/questions', json={'question': question, 'mode': mode, 'library_ids': selected}, headers=HEADERS)
     assert r.status_code == 200, r.text
     return wait_question(client, r.json()['id'])
+
+
+def retrieve(client, question, scope=None):
+    selected = scope if scope is not None else [l['id'] for l in client.get('/api/libraries').json()]
+    return client.post('/api/qa/search', headers=HEADERS, json={'question': question, 'library_ids': selected})
 
 
 @pytest.fixture(scope='module')
@@ -80,7 +87,7 @@ def test_auth_and_permission_boundary(environment):
     assert emp.post('/api/libraries',headers=HEADERS,json={'name':'forbidden'}).status_code == 403
     assert emp.post('/api/qa/search',headers=HEADERS,json={'question':'ORBIT-7429','library_ids':[private]}).status_code == 404
     assert emp.post('/api/qa/questions',headers=HEADERS,json={'question':'ORBIT-7429','library_ids':[private]}).status_code == 404
-    results = emp.post('/api/qa/search',headers=HEADERS,json={'question':'研发保密代号 ORBIT-7429 是什么？'}).json()['results']
+    results = retrieve(emp, '研发保密代号 ORBIT-7429 是什么？').json()['results']
     assert all(r['library_id'] == public and 'ORBIT-7429' not in r['text'] for r in results)
     assert admin.post('/api/libraries',json={'name':'csrf'}).status_code == 403
     assert admin.post('/api/libraries',headers={**HEADERS,'Origin':'https://untrusted.example'},json={'name':'csrf'}).status_code == 403
@@ -99,7 +106,7 @@ def test_auth_and_permission_boundary(environment):
 ])
 def test_six_formats_real_retrieval(environment,query,extension,locator):
     _, emp, _, _, _, _ = environment
-    results = emp.post('/api/qa/search',headers=HEADERS,json={'question':query}).json()['results']
+    results = retrieve(emp, query).json()['results']
     # Expanded policies intentionally repeat some facts across PDF and XLSX.
     # Verify the annotated format remains retrieved and cited, without requiring
     # one equally valid format to always outrank the other.
@@ -149,7 +156,7 @@ def test_duplicate_delete_reindex_and_ocr(environment):
     assert new and new[0]['id'] != old[0]['id']
     assert admin.delete(f'/api/documents/{did}',headers=HEADERS).status_code==200
     assert not db.rows('SELECT id FROM chunks WHERE document_id=?',(did,))
-    results=emp.post('/api/qa/search',headers=HEADERS,json={'question':'RENEW-8673 归档期限'}).json()['results']
+    results=retrieve(emp, 'RENEW-8673 归档期限').json()['results']
     assert all(c['document_id']!=did for c in results)
     from pypdf import PdfWriter
     stream=io.BytesIO();writer=PdfWriter();writer.add_blank_page(width=595,height=842);writer.write(stream)
@@ -222,11 +229,22 @@ def test_missing_key_unavailable_and_provider_rate_limit(environment,monkeypatch
 def test_persistent_minute_queue_daily_cap_and_cancel(environment,monkeypatch):
     _,emp,_,_,_,_=environment
     reset_quota();mock_upstream(monkeypatch)
-    with db.connect() as c:c.executemany('INSERT INTO model_calls(at,tokens) VALUES(?,?)',[(time.time()-58,100) for _ in range(5)])
+    # Seed the real persisted window when reservation begins. Slow CPU retrieval
+    # must not expire the window before this quota behavior is exercised.
+    reserve=qa.reserve_call
+    primed=False
+    def seed_then_reserve(tokens):
+        nonlocal primed
+        if not primed:
+            primed=True
+            with db.connect() as c:c.executemany('INSERT INTO model_calls(at,tokens) VALUES(?,?)',[(time.time()-58,100) for _ in range(5)])
+        return reserve(tokens)
+    monkeypatch.setattr(qa,'reserve_call',seed_then_reserve)
     q=ask(emp,'新员工如何领取办公设备？','ai')
     assert q['status']=='completed'
     assert any('waiting_quota' in e['payload'] for e in db.rows('SELECT payload FROM events WHERE question_id=?',(q['id'],)))
     assert qa.quota_state()['day_used']==6
+    monkeypatch.setattr(qa,'reserve_call',reserve)
     reset_quota()
     with db.connect() as c:c.executemany('INSERT INTO model_calls(at,tokens) VALUES(?,?)',[(time.time()-120,100) for _ in range(100)])
     q=ask(emp,'新员工如何领取办公设备？','ai')
@@ -234,7 +252,7 @@ def test_persistent_minute_queue_daily_cap_and_cancel(environment,monkeypatch):
     assert qa.quota_state()['day_used']==100
     reset_quota()
     with db.connect() as c:c.executemany('INSERT INTO model_calls(at,tokens) VALUES(?,?)',[(time.time(),100) for _ in range(5)])
-    result=emp.post('/api/qa/questions',headers=HEADERS,json={'question':'新员工如何领取办公设备？','mode':'ai'}).json()
+    result=emp.post('/api/qa/questions',headers=HEADERS,json={'question':'新员工如何领取办公设备？','mode':'ai','library_ids':[l['id'] for l in emp.get('/api/libraries').json()]}).json()
     time.sleep(.8)
     assert emp.post(f'/api/qa/questions/{result["id"]}/cancel',headers=HEADERS).status_code==200
     assert wait_question(emp,result['id'])['status']=='cancelled'
@@ -264,7 +282,7 @@ def test_local_model_failure_is_explicit(environment,monkeypatch):
     def unavailable(*args,**kwargs):
         raise ModelUnavailable('本地模型不可用，请检查模型文件。')
     monkeypatch.setattr(models,'embed',unavailable)
-    response=admin.post('/api/qa/search',headers=HEADERS,json={'question':'差旅报销需要什么凭证？'})
+    response=retrieve(admin, '差旅报销需要什么凭证？')
     assert response.status_code==503 and '本地模型不可用' in response.json()['detail']
     q=ask(admin,'差旅报销需要什么凭证？')
     assert q['status']=='model_unavailable' and '本地模型不可用' in q['answer']

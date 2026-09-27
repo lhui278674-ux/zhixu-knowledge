@@ -6,7 +6,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 from . import db
-from .auth import allowed_ids, document_access
+from .auth import question_library_ids, document_access
 from .config import DATA, MODELS, EMBED_ID
 from .parsers import parse, NeedsOCR, ParseError
 
@@ -117,8 +117,7 @@ def submit_document(doc_id, version):
 
 def search(user, question, library_ids=None, limit=6):
     # SQL membership filtering runs BEFORE lexical/vector retrieval and reranking.
-    permitted = allowed_ids(user)
-    selected = permitted if library_ids is None else [x for x in library_ids if x in permitted]
+    selected = question_library_ids(user, library_ids)
     if not selected:
         return []
     placeholders = ','.join('?' for _ in selected)
@@ -162,8 +161,8 @@ def fresh_citations(user, citations):
     for c in citations:
         try:
             d = document_access(user, c['document_id'])
-            chunk = db.one('SELECT id FROM chunks WHERE id=?', (c['chunk_id'],))
-            if d['status'] == 'ready' and d['version'] == c['version'] and chunk:
+            chunk = db.one('SELECT text FROM chunks WHERE id=? AND document_id=?', (c['chunk_id'], c['document_id']))
+            if d['status'] == 'ready' and d['version'] == c['version'] and chunk and chunk['text'] == c['text']:
                 fresh.append(c)
         except Exception:
             continue
