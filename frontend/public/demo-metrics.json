@@ -1,0 +1,178 @@
+{
+  "documents": 32,
+  "libraries": 7,
+  "directories": 20,
+  "formats": {
+    "pdf": 3,
+    "docx": 6,
+    "xlsx": 4,
+    "pptx": 2,
+    "txt": 4,
+    "md": 13
+  },
+  "characters": 39776,
+  "chunks": 588,
+  "smallest_document_characters": 496,
+  "per_document": [
+    {
+      "name": "出差管理办法（虚构）.pdf",
+      "characters": 3395,
+      "chunks": 10
+    },
+    {
+      "name": "人事制度（虚构）.docx",
+      "characters": 1823,
+      "chunks": 40
+    },
+    {
+      "name": "费用标准（虚构）.xlsx",
+      "characters": 3026,
+      "chunks": 31
+    },
+    {
+      "name": "星舟项目介绍（虚构）.pptx",
+      "characters": 1572,
+      "chunks": 12
+    },
+    {
+      "name": "办公设备指引（虚构）.txt",
+      "characters": 1424,
+      "chunks": 16
+    },
+    {
+      "name": "信息访问规范（虚构）.md",
+      "characters": 645,
+      "chunks": 14
+    },
+    {
+      "name": "研发机密（虚构）.md",
+      "characters": 496,
+      "chunks": 11
+    },
+    {
+      "name": "公司概况与业务地图（虚构）.md",
+      "characters": 1012,
+      "chunks": 19
+    },
+    {
+      "name": "组织通讯与服务目录（虚构）.xlsx",
+      "characters": 3572,
+      "chunks": 37
+    },
+    {
+      "name": "会议与任务协作规范（虚构）.md",
+      "characters": 687,
+      "chunks": 15
+    },
+    {
+      "name": "季度经营计划（虚构）.pptx",
+      "characters": 824,
+      "chunks": 7
+    },
+    {
+      "name": "采购申请与验收流程（虚构）.docx",
+      "characters": 1003,
+      "chunks": 25
+    },
+    {
+      "name": "供应商服务评价与续费（虚构）.docx",
+      "characters": 737,
+      "chunks": 19
+    },
+    {
+      "name": "预算与预支管理（虚构）.xlsx",
+      "characters": 3659,
+      "chunks": 35
+    },
+    {
+      "name": "差旅报销实务与案例（虚构）.md",
+      "characters": 763,
+      "chunks": 17
+    },
+    {
+      "name": "IT工单分级与升级（虚构）.txt",
+      "characters": 852,
+      "chunks": 19
+    },
+    {
+      "name": "常见故障排查手册（虚构）.txt",
+      "characters": 853,
+      "chunks": 19
+    },
+    {
+      "name": "备份与业务连续性计划（虚构）.pdf",
+      "characters": 883,
+      "chunks": 2
+    },
+    {
+      "name": "账号申请与资产交接（虚构）.docx",
+      "characters": 681,
+      "chunks": 19
+    },
+    {
+      "name": "客户交付标准流程（虚构）.docx",
+      "characters": 906,
+      "chunks": 23
+    },
+    {
+      "name": "客户工单与服务承诺（虚构）.md",
+      "characters": 761,
+      "chunks": 17
+    },
+    {
+      "name": "桥云服务台常见问题（虚构）.txt",
+      "characters": 772,
+      "chunks": 17
+    },
+    {
+      "name": "青禾项目交付复盘（虚构）.pdf",
+      "characters": 908,
+      "chunks": 2
+    },
+    {
+      "name": "九月客户服务月报（虚构）.xlsx",
+      "characters": 3007,
+      "chunks": 34
+    },
+    {
+      "name": "青禾项目启动计划（虚构）.docx",
+      "characters": 885,
+      "chunks": 21
+    },
+    {
+      "name": "青禾需求与变更清单（虚构）.md",
+      "characters": 763,
+      "chunks": 17
+    },
+    {
+      "name": "星舟项目周会纪要（虚构）.md",
+      "characters": 676,
+      "chunks": 15
+    },
+    {
+      "name": "需求评审与质量检查（虚构）.md",
+      "characters": 646,
+      "chunks": 15
+    },
+    {
+      "name": "研发架构与技术决策（虚构）.md",
+      "characters": 685,
+      "chunks": 15
+    },
+    {
+      "name": "ORBIT研发计划（虚构）.md",
+      "characters": 629,
+      "chunks": 15
+    },
+    {
+      "name": "研发发布和回滚检查（虚构）.md",
+      "characters": 629,
+      "chunks": 15
+    },
+    {
+      "name": "研发风险与问题清单（虚构）.md",
+      "characters": 602,
+      "chunks": 15
+    }
+  ]
+}

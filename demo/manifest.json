@@ -1,0 +1,333 @@
+{
+  "version": 2,
+  "fictional": true,
+  "company": "星桥科技",
+  "notice": "本文中的公司、人员、客户、金额、联系方式和业务记录均为虚构，仅用于知序项目演示。",
+  "libraries": [
+    {
+      "key": "public",
+      "name": "员工手册 · 虚构演示",
+      "description": "星桥科技的入职、人事、差旅、办公设备和信息访问制度。"
+    },
+    {
+      "key": "company",
+      "name": "公司与协作 · 虚构演示",
+      "description": "公司概况、组织分工、会议协作与经营规划。"
+    },
+    {
+      "key": "finance",
+      "name": "财务与采购 · 虚构演示",
+      "description": "预算、采购、供应商、合同流转与报销操作案例。"
+    },
+    {
+      "key": "it",
+      "name": "IT 服务与运维 · 虚构演示",
+      "description": "服务台、账号、资产、故障处理与业务连续性资料。"
+    },
+    {
+      "key": "delivery",
+      "name": "客户与交付 · 虚构演示",
+      "description": "售前、交付、客户服务、运营复盘及项目记录。"
+    },
+    {
+      "key": "projects",
+      "name": "项目与产品 · 虚构演示",
+      "description": "星舟与青禾项目的需求、计划、会议和质量资料。"
+    },
+    {
+      "key": "private",
+      "name": "研发保密 · 虚构演示",
+      "description": "虚构研发架构、发布计划、风险与技术决策资料。"
+    }
+  ],
+  "documents": [
+    {
+      "path": "public/出差管理办法（虚构）.pdf",
+      "library": "public",
+      "directory": "行政与差旅",
+      "owner": "许澄",
+      "code": "FIN-TR-2026-01",
+      "sha256": "2df60413a09006b9290f36fe76e464059eea1ed217bff10852ed3ca2a478f3c3",
+      "size": 12236
+    },
+    {
+      "path": "public/人事制度（虚构）.docx",
+      "library": "public",
+      "directory": "入职与人事",
+      "owner": "顾宁",
+      "code": "HR-2026-09",
+      "sha256": "12e3f299cbc3e7b6cd2f547779ce3a8d1bbfb580103a67b6ef10fb43f36e2fac",
+      "size": 39944
+    },
+    {
+      "path": "public/费用标准（虚构）.xlsx",
+      "library": "public",
+      "directory": "行政与差旅",
+      "owner": "许澄",
+      "code": "FIN-EXP-2026",
+      "sha256": "54649f83815752ec6a8d1ce36a79424f0afbbbe2acb44ed3e4483d6d4783f93b",
+      "size": 9277
+    },
+    {
+      "path": "public/星舟项目介绍（虚构）.pptx",
+      "library": "public",
+      "directory": "团队项目",
+      "owner": "林舟",
+      "code": "PRJ-XZ-2026",
+      "sha256": "07d1b45e861e215e4546390adafe151c0c26ff50c4287632a74a653d7150f6df",
+      "size": 45014
+    },
+    {
+      "path": "public/办公设备指引（虚构）.txt",
+      "library": "public",
+      "directory": "办公与信息",
+      "owner": "陈屿",
+      "code": "IT-USER-2026",
+      "sha256": "6b645505dbdd42b5be279a225417bc55200f7e9ba9ce830ef75490b1d87755ff",
+      "size": 3996
+    },
+    {
+      "path": "public/信息访问规范（虚构）.md",
+      "library": "public",
+      "directory": "办公与信息",
+      "owner": "周砚",
+      "code": "INFO-2026-09",
+      "sha256": "5bf2c7da4ea13dff42496036e46da35ddbcee418fd659456f84eaa67071a5b9e",
+      "size": 1848
+    },
+    {
+      "path": "private/研发机密（虚构）.md",
+      "library": "private",
+      "directory": "研发规划",
+      "owner": "林舟",
+      "code": "RD-INDEX-001",
+      "sha256": "e31b7138e9d6ec905b9031f341671d72a4fcd1b7dbb49aeb532dc76a3ef3bc5f",
+      "size": 1443
+    },
+    {
+      "path": "company/公司概况与业务地图（虚构）.md",
+      "library": "company",
+      "directory": "组织与协作",
+      "owner": "周砚",
+      "code": "ORG-001",
+      "sha256": "ac824a64967af48312803db9b96f40f9f24845bfa056588971dd1027d2df390a",
+      "size": 2840
+    },
+    {
+      "path": "company/组织通讯与服务目录（虚构）.xlsx",
+      "library": "company",
+      "directory": "组织与协作",
+      "owner": "顾宁",
+      "code": "ORG-002",
+      "sha256": "e518215afcfb7229e25869a700e860ba308cd0c1afb2e77c071f0a6bb3701faf",
+      "size": 10153
+    },
+    {
+      "path": "company/会议与任务协作规范（虚构）.md",
+      "library": "company",
+      "directory": "组织与协作",
+      "owner": "周砚",
+      "code": "COL-003",
+      "sha256": "81584964d437b97ddccfe353317f6d285397ae8b7305fedf5ca733a0bba183ef",
+      "size": 1983
+    },
+    {
+      "path": "company/季度经营计划（虚构）.pptx",
+      "library": "company",
+      "directory": "经营规划",
+      "owner": "周砚",
+      "code": "PLAN-Q4",
+      "sha256": "46ab2e94b8f9827236d5f714be154676e613f8d7bbff8480d8725cc3d515cfbb",
+      "size": 37495
+    },
+    {
+      "path": "finance/采购申请与验收流程（虚构）.docx",
+      "library": "finance",
+      "directory": "采购与供应商",
+      "owner": "许澄",
+      "code": "FIN-PO-001",
+      "sha256": "c5818fa40a7a613489418d678519365ef984af1a5e50640ca481611a5b4415b9",
+      "size": 38747
+    },
+    {
+      "path": "finance/供应商服务评价与续费（虚构）.docx",
+      "library": "finance",
+      "directory": "采购与供应商",
+      "owner": "许澄",
+      "code": "FIN-SUP-002",
+      "sha256": "572cbde50fa8c7687bdc5693799afde7e7e585fc3d220625969654c1aa31cdd8",
+      "size": 38426
+    },
+    {
+      "path": "finance/预算与预支管理（虚构）.xlsx",
+      "library": "finance",
+      "directory": "预算与报销",
+      "owner": "许澄",
+      "code": "FIN-BUD-003",
+      "sha256": "f252108aaeb43cac053b2a3e12757efc7591cdfbe9d02d203f03d3b8a2b26b61",
+      "size": 10504
+    },
+    {
+      "path": "finance/差旅报销实务与案例（虚构）.md",
+      "library": "finance",
+      "directory": "预算与报销",
+      "owner": "许澄",
+      "code": "FIN-TR-CASE",
+      "sha256": "c5f16765c6a45d5c211c7ff299d6fb1a59bf3744a796c1a45fa55253256b4c1f",
+      "size": 2041
+    },
+    {
+      "path": "it/IT工单分级与升级（虚构）.txt",
+      "library": "it",
+      "directory": "服务台操作",
+      "owner": "陈屿",
+      "code": "IT-OPS-001",
+      "sha256": "5367e5049586ab638a9aea4d7b09dbc6906be39ea7300fd381979914a0670a7d",
+      "size": 2412
+    },
+    {
+      "path": "it/常见故障排查手册（虚构）.txt",
+      "library": "it",
+      "directory": "故障与连续性",
+      "owner": "陈屿",
+      "code": "IT-RUN-002",
+      "sha256": "1388f07bc2aebf8e23fe898b11d34d97948f70795aaa49c85ce07b8fdefc7b4a",
+      "size": 2479
+    },
+    {
+      "path": "it/备份与业务连续性计划（虚构）.pdf",
+      "library": "it",
+      "directory": "故障与连续性",
+      "owner": "陈屿",
+      "code": "IT-BCP-003",
+      "sha256": "4e91996d2ad99968422f7de59a7fea5baa9f56fa19851fb35609dfc9591ee272",
+      "size": 4687
+    },
+    {
+      "path": "it/账号申请与资产交接（虚构）.docx",
+      "library": "it",
+      "directory": "资产与访问",
+      "owner": "陈屿",
+      "code": "IT-ASSET-004",
+      "sha256": "d9559458ca2284ffc7bf3b7def5f9c3ebed76183846d6af1281b4340dd33de2f",
+      "size": 38251
+    },
+    {
+      "path": "delivery/客户交付标准流程（虚构）.docx",
+      "library": "delivery",
+      "directory": "交付流程",
+      "owner": "沈言",
+      "code": "DEL-001",
+      "sha256": "ecd2159083e79ed7e57bf97ac4cae70551fcf474da4539ea18905b57d46158cd",
+      "size": 38629
+    },
+    {
+      "path": "delivery/客户工单与服务承诺（虚构）.md",
+      "library": "delivery",
+      "directory": "客户服务",
+      "owner": "沈言",
+      "code": "CS-002",
+      "sha256": "98c872c4cf0333b2767c684fd360073d5ba683ea6ebbf73d7f9bea050fdc4f5c",
+      "size": 2175
+    },
+    {
+      "path": "delivery/桥云服务台常见问题（虚构）.txt",
+      "library": "delivery",
+      "directory": "客户服务",
+      "owner": "沈言",
+      "code": "CS-FAQ-003",
+      "sha256": "f2cfea23006d03f7e1b5ba7d95b7b0ef76f652c536e8f1547bc000dc6c68a927",
+      "size": 2260
+    },
+    {
+      "path": "delivery/青禾项目交付复盘（虚构）.pdf",
+      "library": "delivery",
+      "directory": "交付复盘",
+      "owner": "沈言",
+      "code": "RETRO-QH-004",
+      "sha256": "efa97f3bd7dc25fc3a04d43728cc978f818712a5d1e340a76c8ad0540ac61400",
+      "size": 4884
+    },
+    {
+      "path": "delivery/九月客户服务月报（虚构）.xlsx",
+      "library": "delivery",
+      "directory": "运营记录",
+      "owner": "沈言",
+      "code": "CS-SEP-005",
+      "sha256": "3a4e3b73f3248a3f7181c2310f62f9a36b63c15c8070ed7536db884d1bacc727",
+      "size": 10385
+    },
+    {
+      "path": "projects/青禾项目启动计划（虚构）.docx",
+      "library": "projects",
+      "directory": "青禾项目",
+      "owner": "沈言",
+      "code": "PRJ-QH-001",
+      "sha256": "359e200ff85ae7eeb8a27c4a68b76300bc9d30a4a185541307792ac0357b061b",
+      "size": 38541
+    },
+    {
+      "path": "projects/青禾需求与变更清单（虚构）.md",
+      "library": "projects",
+      "directory": "青禾项目",
+      "owner": "周砚",
+      "code": "PRJ-QH-REQ",
+      "sha256": "98faef80cdda74797f58f0145b609b25d071ea7cdd5817bb7ad10f89f1bed39d",
+      "size": 2017
+    },
+    {
+      "path": "projects/星舟项目周会纪要（虚构）.md",
+      "library": "projects",
+      "directory": "星舟项目",
+      "owner": "林舟",
+      "code": "PRJ-XZ-M09",
+      "sha256": "54574c23377c2e83d756f5f7861b2b727d626da07995b7469a7fabc53c099033",
+      "size": 1896
+    },
+    {
+      "path": "projects/需求评审与质量检查（虚构）.md",
+      "library": "projects",
+      "directory": "质量与发布",
+      "owner": "宋禾",
+      "code": "QA-001",
+      "sha256": "12f13cb8c14c18fde29124c56b8b1a04a8b7ec85710ba30fd112f18a55b0b1de",
+      "size": 1908
+    },
+    {
+      "path": "private/研发架构与技术决策（虚构）.md",
+      "library": "private",
+      "directory": "研发规划",
+      "owner": "林舟",
+      "code": "RD-ADR-001",
+      "sha256": "140238cd404d8fdee75a8e1668a6ab6b7735a17a3d3fcfbc64e450f3b11322ab",
+      "size": 1985
+    },
+    {
+      "path": "private/ORBIT研发计划（虚构）.md",
+      "library": "private",
+      "directory": "研发规划",
+      "owner": "林舟",
+      "code": "RD-ORBIT-002",
+      "sha256": "a8b37dfe7153165f8aba4adaa91a579c42b5601df00f304dde6e5547f6fff894",
+      "size": 1767
+    },
+    {
+      "path": "private/研发发布和回滚检查（虚构）.md",
+      "library": "private",
+      "directory": "发布与风险",
+      "owner": "陈屿",
+      "code": "RD-REL-003",
+      "sha256": "12921997969f52d2987bb54c88d92bfabef673b096f9fd86c4efde8b1f12ebf7",
+      "size": 1823
+    },
+    {
+      "path": "private/研发风险与问题清单（虚构）.md",
+      "library": "private",
+      "directory": "发布与风险",
+      "owner": "宋禾",
+      "code": "RD-RISK-004",
+      "sha256": "16a6280f955d02e4ac8adf32afdf13ad0244b2b624639eff429e9061faf449d3",
+      "size": 1714
+    }
+  ]
+}

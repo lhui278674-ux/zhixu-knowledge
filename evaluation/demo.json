@@ -1,0 +1,15 @@
+{
+  "name": "虚构演示回归集（不能代表真实企业准确率）",
+  "fictional": true,
+  "cases": [
+    {"question":"差旅报销需要什么凭证？","expected":[{"name":"出差管理办法（虚构）.pdf","locator":{"page":2}}]},
+    {"question":"请假需要提前多久申请？","expected":[{"name":"人事制度（虚构）.docx","locator":{"paragraph":4}}]},
+    {"question":"餐费上限是多少？","expected":[{"name":"费用标准（虚构）.xlsx","locator":{"sheet":"费用标准","range":"A3:D3"}}]},
+    {"question":"星舟项目的交付节点是什么？","expected":[{"name":"星舟项目介绍（虚构）.pptx","locator":{"slide":2}}]},
+    {"question":"新员工如何领取办公设备？","expected":[{"name":"办公设备指引（虚构）.txt","locator":{"paragraph":2}},{"name":"人事制度（虚构）.docx","locator":{"paragraph":6}}]},
+    {"question":"员工需要新增知识库访问权限时应该找谁？","expected":[{"name":"信息访问规范（虚构）.md","locator":{"paragraph":3}}]},
+    {"question":"出差住宿上限是多少？","expected":[{"name":"出差管理办法（虚构）.pdf","locator":{"page":1}},{"name":"费用标准（虚构）.xlsx","locator":{"sheet":"费用标准","range":"A2:D2"}}],"expect_status":"conflict"},
+    {"question":"公司2028年在南极新建工厂的投资预算是多少？","expected":[],"expect_status":"insufficient"},
+    {"question":"怎么办","expected":[],"expect_status":"clarify"}
+  ]
+}
