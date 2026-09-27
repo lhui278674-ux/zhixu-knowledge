@@ -20,6 +20,8 @@ Node 24 执行 `node --test frontend/tests/public-demo.test.mjs`：**5 个流程
 
 默认前端与公开演示前端均通过 TypeScript / Vite 构建。GitHub Actions 对两种构建与公开流程设置发布前检查。静态演示没有真实登录或服务端授权，不能用这些测试替代完整后端的安全边界验证。
 
+本轮源码已推送 `main`（功能提交 `1e3918b`）。[GitHub Actions 36315855809](https://github.com/lhui278674-ux/zhixu-knowledge/actions/runs/36315855809) 的流程测试及两种构建通过；Pages 配置步骤失败。仓库 API 返回 `has_pages=false`，站点部署尚未完成，不能宣称在线体验已更新。
+
 此前公开演示的 Edge 浏览器检查未取得新截图。固定领域阶段改用独立本地服务和内置浏览器，验证真实资料问答、原文定位、拒答、帮助和缺资料状态，并保存私人截图；没有把这次本地浏览器结果描述为公开站点已部署成功。已有桌面和窄屏记录见 [UI_ACCEPTANCE.md](UI_ACCEPTANCE.md)。
 
 ## 生成模型与已有 UI 验证

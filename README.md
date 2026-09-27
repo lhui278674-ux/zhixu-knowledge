@@ -4,6 +4,8 @@
 
 **[在线体验](https://lhui278674-ux.github.io/zhixu-knowledge/) · [演示资料与体验路线](docs/DEMO_CORPUS.md) · [架构设计](docs/DESIGN.md) · [本地运行](docs/RUNNING.md)**
 
+当前仓库尚未启用 GitHub Pages，在线入口的本次部署未完成；源码和本地完整版本已更新。具体构建与部署结果见 [验收说明](docs/ACCEPTANCE.md)。
+
 知序是可独立部署的中文企业知识库系统：员工查阅资料、检索和提问，管理员管理文库、成员和审核。React + TypeScript 前端，FastAPI + SQLite 后端，本地 BGE 混合检索；原文引用可追溯到页、段落、表格行、单元格或幻灯片。虚构公司资料是可选演示包，真实部署从空知识库开始。
 
 长期实施目标和当前进度见 [PROJECT_GOAL.md](PROJECT_GOAL.md)、[ROADMAP.md](ROADMAP.md)、[CURRENT_TASK.md](CURRENT_TASK.md)。目前交付固定领域限制的首个可运行阶段；管理员模型配置、完整工具型 Agent 和云部署仍在路线中。
